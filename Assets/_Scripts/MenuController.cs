@@ -16,6 +16,8 @@ public enum UIPanelTypes
 
 public class MenuController : MonoBehaviour
 {
+    public bool DEV_MODE;
+
     [SerializeField]
     GameObject[] MenuPanels = new GameObject[(int)UIPanelTypes.PANEL_COUNT];
 
@@ -29,6 +31,11 @@ public class MenuController : MonoBehaviour
 
     void Start()
     {
+        if (DEV_MODE)
+        {
+            SwitchUIState(UIPanelTypes.GAME_UI);
+            return;
+        }
         SwitchUIState(UIPanelTypes.MAIN_MENU);
     }
 

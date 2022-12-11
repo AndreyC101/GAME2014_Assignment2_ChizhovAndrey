@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Camera
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Player
+  - Enemies
+  - Pickups
+  - Killboxes
   - 
   - 
   - 
@@ -40,4 +40,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 2370507275
+    locked: 0
+  - name: Checkpoints
+    uniqueID: 1458302827
+    locked: 0
+  - name: Platforms
+    uniqueID: 2778092575
+    locked: 0
+  - name: Actors
+    uniqueID: 2466054931
+    locked: 0
+  - name: Items
+    uniqueID: 3120587763
+    locked: 0
+  - name: Foreground
+    uniqueID: 3830532751
     locked: 0
