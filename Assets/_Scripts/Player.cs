@@ -99,13 +99,13 @@ public class Player : MonoBehaviour
             if (isGrounded)
             {
                 jumpInputReleased = false;
-                Jump(false);
+                Jump(false, 0.0f);
                 StartCoroutine(EnableDoubleJump());
             }
             else if (doubleJumpAvailable && jumpInputReleased)
             {
                 doubleJumpAvailable = false;
-                Jump(true);
+                Jump(true, 0.0f);
             }
         }
         else jumpInputReleased = true;
@@ -134,10 +134,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Jump(bool second)
+    public void Jump(bool second, float launchForce)
     {
         rb.velocity = new Vector2(rb.velocity.x, 0.0f);
-        rb.AddForce((Vector2.up * 10 + (second && (Mathf.Abs(xInput)) > 0.0f ? (xInput * Vector2.right) : Vector3.zero)).normalized * verticalForce, ForceMode2D.Impulse);
+        rb.AddForce((Vector2.up * 10 + (second && (Mathf.Abs(xInput)) > 0.0f ? (xInput * Vector2.right) : Vector3.zero)).normalized * (launchForce == 0.0f ? verticalForce : launchForce), ForceMode2D.Impulse);
         currentJumpMaxVelocityX = Mathf.Abs(rb.velocity.x) + airControl;
         Flip(false);
         anim.SetTrigger("Jump");
@@ -211,7 +211,7 @@ public class Player : MonoBehaviour
         var hit = Physics2D.OverlapCircle(attackPoint.position, attackRadius, enemyLayerMask);
         if (hit)
         {
-            Debug.Log("enemy smacked");
+            hit.gameObject.GetComponent<Enemy>().ApplyDamage(30.0f, transform.position.x);
         }
     }
 
