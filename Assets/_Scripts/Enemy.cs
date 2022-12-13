@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -8,6 +9,7 @@ public class Enemy : MonoBehaviour
 {
     protected Rigidbody2D rb;
     protected Animator anim;
+    protected EnemySenses sense;
     [SerializeField]
     protected Transform groundPoint;
     [SerializeField]
@@ -15,9 +17,9 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     protected Transform forwardPoint;
 
+    [Header("Health")]
     public float health;
     public float hitRecoveryTime;
-    public float attackRecoveryTime;
 
     [Header("Navigation")]
     public bool isMoving;
@@ -35,36 +37,40 @@ public class Enemy : MonoBehaviour
     private bool isForwardGroundDetected;
     private bool isForwardObjectDetected;
 
-    private bool recovering = false;
+    private bool hitRecovering = false;
     private bool hasDied = false;
 
-    private IEnumerator hitCoroutine;
+    public bool attackAvailable = true;
+    public bool isAttacking = false;
 
     protected virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        hitCoroutine = OnHit();
-        direction = new Vector2(1.0f, 0.0f);
+        sense = GetComponentInChildren<EnemySenses>();
+        direction = new Vector2(-1.0f, 0.0f);
+        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("SkeletonAnimationController");
     }
 
     protected virtual void FixedUpdate()
     {
-        Move();
+        if (hasDied) return;
+        if (isMoving) Move();
+        if (isMoving && sense.playerBehind) Flip();
         UpdateAnimationMovementProperties();
     }
 
-    public void ApplyDamage(float damage, float playerXposition)
+    public virtual void ApplyDamage(float damage, float playerXposition)
     {
         if (hasDied) return;
-        StopCoroutine(hitCoroutine);
+        StopAllCoroutines();
         health -= damage;
         float incomingDamageDirectionX = playerXposition - transform.position.x;
-        rb.AddForce(Vector2.up + new Vector2(-incomingDamageDirectionX, 0.0f).normalized, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up + new Vector2(-incomingDamageDirectionX, 0.0f).normalized * 5.0f, ForceMode2D.Impulse);
         if (health > 0)
         {
             GetComponent<Animator>().SetTrigger("Hit");
-            recovering = true;
+            hitRecovering = true;
             StartCoroutine(OnHit());
         }
         else
@@ -76,8 +82,9 @@ public class Enemy : MonoBehaviour
 
     protected void Die()
     {
-        GetComponent<Animator>().SetTrigger("Death");
         hasDied = true;
+        StopAllCoroutines();
+        GetComponent<Animator>().SetTrigger("Death");
         StartCoroutine(OnDied());
     }
 
@@ -105,18 +112,19 @@ public class Enemy : MonoBehaviour
 
     protected void Move()
     {
-        if (hasDied || recovering) return;
         UpdateMovementComponents();
-        if (!isMoving || !isGrounded) return;
-        
+
+        if (!IsActionReady()) return;
+
         if (isForwardGroundDetected)
         {
             rb.AddForce(new Vector2(-transform.localScale.x * moveAcceleration, 0.0f), ForceMode2D.Impulse);
             rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -maxMoveSpeed, maxMoveSpeed), rb.velocity.y);
         }
-        else if (!isForwardGroundDetected || isForwardObjectDetected)
+        
+        if ((!isForwardGroundDetected || isForwardObjectDetected))
         {
-            Flip();
+            if (!sense.lineOfSight) Flip();
         }
     }
 
@@ -128,14 +136,21 @@ public class Enemy : MonoBehaviour
     protected void Flip()
     {
         direction *= -1.0f;
-        transform.localScale = new Vector3(transform.localScale.x * direction.x, transform.localScale.y, transform.localScale.z);
-        
+        transform.localScale = new Vector3(transform.localScale.x * -1.0f, transform.localScale.y, transform.localScale.z);
+    }
+
+    protected bool IsActionReady()
+    {
+        return (!hitRecovering && !hasDied && !isAttacking && isGrounded);
     }
 
     IEnumerator OnHit()
     {
         yield return new WaitForSeconds(hitRecoveryTime);
-        recovering = false;
+        hitRecovering = false;
+        isMoving = true;
+        isAttacking = false;
+        attackAvailable = true;
         anim.SetTrigger("HitRecover");
     }
 

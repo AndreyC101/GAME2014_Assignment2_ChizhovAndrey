@@ -6,10 +6,12 @@ public class EnemySenses : MonoBehaviour
 {
     public bool playerDetected;
     public bool lineOfSight;
+    public bool playerBehind;
     public LayerMask visualCollisionLayerMask;
     private Transform playerTransform;
     private float playerDirection;
     private float enemyDirection;
+    private float distanceToEnemy;
 
     private Vector2 playerDirectionVector;
 
@@ -28,15 +30,30 @@ public class EnemySenses : MonoBehaviour
     {
         if (playerDetected && playerTransform)
         {
-            playerDirectionVector = (playerTransform.localPosition - transform.position).normalized;
+            distanceToEnemy = (playerTransform.position - transform.position).magnitude;
+            playerDirectionVector = (playerTransform.position - transform.position).normalized;
             playerDirection = (playerDirectionVector.x > 0 ? 1.0f : -1.0f);
             enemyDirection = GetComponentInParent<Enemy>().direction.x;
-            var hits = Physics2D.Linecast(transform.position, playerTransform.position, visualCollisionLayerMask);
-            if (hits.transform == playerTransform && playerDirection == enemyDirection)
+            var hits = Physics2D.Linecast(transform.position, playerTransform.position + (Vector3.up), visualCollisionLayerMask);
+            if (hits.transform == playerTransform)
             {
-                lineOfSight = true;
+                if (playerDirection == enemyDirection)
+                {
+                    lineOfSight = true;
+                    playerBehind = false;
+                }
+                else
+                {
+                    lineOfSight = false;
+                    playerBehind = true;
+                }
+
             }
-            else lineOfSight = false;
+            else
+            {
+                lineOfSight = false;
+                playerBehind = false;
+            }
         }
     }
 
@@ -55,22 +72,33 @@ public class EnemySenses : MonoBehaviour
         if (collision.transform == playerTransform)
         {
             playerDetected = false;
+            lineOfSight = false;
+            playerBehind = false;
             playerTransform = null;
         }
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.yellow;
 
-        if (lineOfSight)
+        if (IsPlayerInView())
         {
-            Gizmos.DrawLine(transform.position, playerTransform.position);
+            Gizmos.DrawLine(transform.position, playerTransform.position + (Vector3.up));
         }
+    }
 
-        if (playerDetected)
+    public bool IsPlayerInView()
+    {
+        return (playerDetected && lineOfSight && playerTransform);
+    }
+
+    public float GetDistanceToPlayer()
+    {
+        if (IsPlayerInView())
         {
-            Gizmos.DrawWireSphere(transform.position, 15.0f);
+            return distanceToEnemy;
         }
+        return -1.0f;
     }
 }

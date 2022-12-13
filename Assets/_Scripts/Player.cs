@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     [Header("Gameplay")]
     public int lives, coins;
     public float currentHP, maxHP;
+    public float onHitForce;
 
     public LayerMask killboxLayerMask;
 
@@ -56,8 +57,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private MobileController controller;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
@@ -181,6 +181,21 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void ApplyDamage(float incomingDamage, float incomingDamageXPosition)
+    {
+        if (incomingDamageXPosition != 0.0f)
+        {
+            Vector2 forceDirection = new Vector2(incomingDamageXPosition - transform.position.x, 1.0f).normalized;
+            rb.AddForce(forceDirection * onHitForce, ForceMode2D.Impulse);
+        }
+        currentHP -= incomingDamage;
+        if (currentHP < 0.0f)
+        {
+            currentHP = 0.0f;
+            OnPlayerLifeLost();
+        }
+    }
+
     private void OnPlayerLifeLost()
     {
         lives--;
@@ -194,10 +209,41 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Respawn()
+    public void Respawn()
     {
         transform.position = cs.GetCurrentPlayerCheckpointPosition();
+        rb.velocity = Vector3.zero;
+        currentHP = maxHP;
     }
+
+    public void ResetPlayer()
+    {
+        lives = 5;
+        coins = 0;
+        Respawn();
+    }
+
+    public void Heal(float amount)
+    {
+        currentHP += amount;
+        if (currentHP > maxHP) currentHP = maxHP;
+    }
+
+    public void CollectCoin()
+    {
+        coins++;
+        if (coins == 100)
+        {
+            coins = 0;
+            lives++;
+        }
+    }
+
+    public float GetVelocityY()
+    {
+        return rb.velocity.y;
+    }
+
 
     IEnumerator EnableDoubleJump()
     {

@@ -47,9 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerDetected: 0
   lineOfSight: 0
+  playerBehind: 0
   visualCollisionLayerMask:
     serializedVersion: 2
-    m_Bits: 448
+    m_Bits: 192
 --- !u!58 &7438974898395814397
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -215,21 +216,29 @@ MonoBehaviour:
   forwardGroundPoint: {fileID: 8512920290761734767}
   forwardPoint: {fileID: 8512920290747193392}
   health: 100
-  hitRecoveryTime: 1
-  attackRecoveryTime: 2
+  hitRecoveryTime: 0.8
   isMoving: 1
-  maxMoveSpeed: 5
-  moveAcceleration: 3
+  maxMoveSpeed: 2
+  moveAcceleration: 1.5
   direction: {x: 0, y: 0}
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   hazardLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   groundDetectionRadius: 0.4
   forwardGroundDetectionRadius: 0.1
   forwardDetectionRadius: 0.64
+  attackAvailable: 1
+  isAttacking: 0
+  attackRange: 0.35
+  attackChargeTime: 0.25
+  attackRadius: 0.5
+  attackRecoveryTime: 1.5
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!212 &8512920291784075437
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -330,7 +339,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 0}
-  m_CullingMode: 0
+  m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
