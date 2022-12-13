@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Animations;
+//using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -37,11 +37,11 @@ public class Enemy : MonoBehaviour
     private bool isForwardGroundDetected;
     private bool isForwardObjectDetected;
 
-    private bool hitRecovering = false;
-    private bool hasDied = false;
+    private bool hitRecovering;
+    private bool hasDied;
 
-    public bool attackAvailable = true;
-    public bool isAttacking = false;
+    public bool attackAvailable;
+    public bool isAttacking;
 
     protected virtual void Start()
     {
@@ -50,7 +50,11 @@ public class Enemy : MonoBehaviour
         sense = GetComponentInChildren<EnemySenses>();
         direction = new Vector2(-1.0f, 0.0f);
         anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("SkeletonAnimationController");
-    }
+        hitRecovering = false;
+        hasDied = false;
+        attackAvailable = true;
+        isAttacking = false;
+}
 
     protected virtual void FixedUpdate()
     {
@@ -82,6 +86,7 @@ public class Enemy : MonoBehaviour
 
     protected void Die()
     {
+        SoundManager.Instance.PlayAudio(SoundID.Enemy_Death);
         hasDied = true;
         StopAllCoroutines();
         GetComponent<Animator>().SetTrigger("Death");

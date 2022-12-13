@@ -10,7 +10,7 @@ public class CoinPickup : MonoBehaviour
         if (player)
         {
             player.CollectCoin();
-            //play sfx
+            SoundManager.Instance.PlayAudio(SoundID.Coin_Collect);
             Destroy(this.gameObject);
         }
     }

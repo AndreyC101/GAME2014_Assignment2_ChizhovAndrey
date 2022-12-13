@@ -13,6 +13,7 @@ public class BouncePlatform : MonoBehaviour
         {
             if (player.GetVelocityY() < 2.0f)
             {
+                SoundManager.Instance.PlayAudio(SoundID.Platform_Bounce);
                 player.Jump(false, bounceForce);
             }
         }

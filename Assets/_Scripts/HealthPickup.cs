@@ -10,7 +10,7 @@ public class HealthPickup : MonoBehaviour
         if (player)
         {
             player.Heal(5.0f);
-            //play sfx
+            SoundManager.Instance.PlayAudio(SoundID.HealthPickup_Collect);
             Destroy(this.gameObject);
         }
     }

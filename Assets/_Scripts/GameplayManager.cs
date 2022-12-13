@@ -44,12 +44,12 @@ public class GameplayManager : MonoBehaviour
         coinsCount = coinsParent.transform.childCount;
         for (int i = 0; i < coinsCount; i++)
         {
-            coinSpawnPositions.Add(enemiesParent.transform.GetChild(i).position);
+            coinSpawnPositions.Add(coinsParent.transform.GetChild(i).position);
         }
         healthPickupsCount = healthPickupsParent.transform.childCount;
         for (int i = 0; i < healthPickupsCount; i++)
         {
-            enemydefaultSpawnPositions.Add(enemiesParent.transform.GetChild(i).position);
+            healthPickupsSpawnPositions.Add(healthPickupsParent.transform.GetChild(i).position);
         }
     }
 

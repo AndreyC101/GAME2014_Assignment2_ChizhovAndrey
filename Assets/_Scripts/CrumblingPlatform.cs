@@ -39,6 +39,7 @@ public class CrumblingPlatform : MonoBehaviour
 
     private void Collapse()
     {
+        SoundManager.Instance.PlayAudio(SoundID.Platform_Crumble);
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.constraints = RigidbodyConstraints2D.None;
         StartCoroutine(Restore());

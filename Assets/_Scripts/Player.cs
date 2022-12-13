@@ -198,10 +198,11 @@ public class Player : MonoBehaviour
 
     private void OnPlayerLifeLost()
     {
+        SoundManager.Instance.PlayAudio(SoundID.Player_Death);
         lives--;
         if (lives == 0)
         {
-            Debug.Log("You have met a bitter end");
+            GameObject.Find("MenuCanvas").GetComponent<MenuController>().OnGameOver();
         }
         else
         {
@@ -232,10 +233,11 @@ public class Player : MonoBehaviour
     public void CollectCoin()
     {
         coins++;
-        if (coins == 100)
+        if (coins == 30)
         {
             coins = 0;
             lives++;
+            SoundManager.Instance.PlayAudio(SoundID.Extra_Life);
         }
     }
 

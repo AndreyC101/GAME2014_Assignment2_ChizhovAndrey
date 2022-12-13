@@ -27,13 +27,14 @@ public class Checkpoint : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         var player = collision.gameObject.GetComponent<Player>();
         if (player)
         {
             cs.SetCurrentPlayerCheckpoint(checkpointID);
         }
+        SoundManager.Instance.PlayAudio(SoundID.Checkpoint_Set);
     }
 
     public Vector3 GetSpawnPosition()
